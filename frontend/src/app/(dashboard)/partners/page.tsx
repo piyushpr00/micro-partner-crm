@@ -1,33 +1,31 @@
-import { PartnerTable } from '@/components/modules/partners/PartnerTable'
-import { Plus, Download, Filter } from 'lucide-react'
+'use client'
 
-// Mock data for initial rendering
-const mockPartners = [
-  {
-    id: '1',
-    name: 'John Doe',
-    email: 'john@example.com',
-    company_name: 'JD Consulting',
-    status: 'active',
-    region: 'North America',
-    commission_rate: 15,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '2',
-    name: 'Sarah Smith',
-    email: 'sarah@example.com',
-    company_name: 'Smith Partners',
-    status: 'pending',
-    region: 'Europe',
-    commission_rate: 10,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  }
-] as any[]
+import { useState, useEffect } from 'react'
+import { PartnerTable } from '@/components/modules/partners/PartnerTable'
+import { PartnerService } from '@/services/partnerService'
+import { Partner } from '@/types'
+import { Plus, Download, Filter, Loader2 } from 'lucide-react'
 
 export default function PartnersPage() {
+  const [partners, setPartners] = useState<Partner[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  const fetchPartners = async () => {
+    try {
+      setIsLoading(true)
+      const data = await PartnerService.getAllPartners()
+      setPartners(data)
+    } catch (error) {
+      console.error('Error fetching partners:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchPartners()
+  }, [])
+
   return (
     <div className="space-y-6">
       <header className="flex items-center justify-between">
@@ -61,7 +59,13 @@ export default function PartnersPage() {
         </button>
       </div>
 
-      <PartnerTable partners={mockPartners} />
+      {isLoading ? (
+        <div className="h-64 flex items-center justify-center">
+          <Loader2 className="animate-spin text-blue-600" size={32} />
+        </div>
+      ) : (
+        <PartnerTable partners={partners} />
+      )}
     </div>
   )
 }
