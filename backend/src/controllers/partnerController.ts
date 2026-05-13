@@ -13,7 +13,7 @@ export class PartnerController {
 
   static async getById(req: Request, res: Response) {
     try {
-      const partner = await PartnerService.getPartnerById(req.params.id);
+      const partner = await PartnerService.getPartnerById(req.params.id as string);
       res.status(200).json(partner);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -31,7 +31,7 @@ export class PartnerController {
 
   static async update(req: Request, res: Response) {
     try {
-      const partner = await PartnerService.updatePartner(req.params.id, req.body);
+      const partner = await PartnerService.updatePartner(req.params.id as string, req.body);
       res.status(200).json(partner);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -40,7 +40,7 @@ export class PartnerController {
 
   static async delete(req: Request, res: Response) {
     try {
-      await PartnerService.deletePartner(req.params.id);
+      await PartnerService.deletePartner(req.params.id as string);
       res.status(204).send();
     } catch (error: any) {
       res.status(500).json({ error: error.message });

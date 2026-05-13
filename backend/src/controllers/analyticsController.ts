@@ -4,7 +4,7 @@ import { CommissionService } from '../services/commissionService';
 export class AnalyticsController {
   static async getPartnerStats(req: Request, res: Response) {
     try {
-      const stats = await CommissionService.getPartnerEarnings(req.params.partnerId);
+      const stats = await CommissionService.getPartnerEarnings(req.params.partnerId as string);
       res.status(200).json(stats);
     } catch (error: any) {
       res.status(500).json({ error: error.message });

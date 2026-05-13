@@ -13,7 +13,7 @@ export class LeadController {
 
   static async getById(req: Request, res: Response) {
     try {
-      const lead = await LeadService.getLeadById(req.params.id);
+      const lead = await LeadService.getLeadById(req.params.id as string);
       res.status(200).json(lead);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -22,7 +22,7 @@ export class LeadController {
 
   static async getByPartner(req: Request, res: Response) {
     try {
-      const leads = await LeadService.getLeadsByPartner(req.params.partnerId);
+      const leads = await LeadService.getLeadsByPartner(req.params.partnerId as string);
       res.status(200).json(leads);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -40,7 +40,7 @@ export class LeadController {
 
   static async update(req: Request, res: Response) {
     try {
-      const lead = await LeadService.updateLead(req.params.id, req.body);
+      const lead = await LeadService.updateLead(req.params.id as string, req.body);
       res.status(200).json(lead);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
@@ -49,7 +49,7 @@ export class LeadController {
 
   static async delete(req: Request, res: Response) {
     try {
-      await LeadService.deleteLead(req.params.id);
+      await LeadService.deleteLead(req.params.id as string);
       res.status(204).send();
     } catch (error: any) {
       res.status(500).json({ error: error.message });

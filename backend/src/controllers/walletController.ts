@@ -4,7 +4,7 @@ import { WalletService } from '../services/walletService';
 export class WalletController {
   static async getWallet(req: Request, res: Response) {
     try {
-      const wallet = await WalletService.getWalletByPartner(req.params.partnerId);
+      const wallet = await WalletService.getWalletByPartner(req.params.partnerId as string);
       res.status(200).json(wallet);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
