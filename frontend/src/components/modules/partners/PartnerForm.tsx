@@ -13,7 +13,7 @@ const partnerSchema = z.object({
   company_name: z.string().optional(),
   region: z.string().optional(),
   status: z.enum(['active', 'inactive', 'pending'] as const),
-  commission_rate: z.coerce.number().min(0).max(100),
+  commission_rate: z.preprocess((v) => parseFloat(String(v)), z.number().min(0).max(100)),
 })
 
 type PartnerFormValues = z.infer<typeof partnerSchema>
