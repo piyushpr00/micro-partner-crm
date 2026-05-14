@@ -16,7 +16,15 @@ const partnerSchema = z.object({
   commission_rate: z.preprocess((v) => parseFloat(String(v)), z.number().min(0).max(100)),
 })
 
-type PartnerFormValues = z.infer<typeof partnerSchema>
+type PartnerFormValues = {
+  name: string
+  email: string
+  phone?: string
+  company_name?: string
+  region?: string
+  status: 'active' | 'inactive' | 'pending'
+  commission_rate: number
+}
 
 interface PartnerFormProps {
   initialData?: Partial<Partner>
