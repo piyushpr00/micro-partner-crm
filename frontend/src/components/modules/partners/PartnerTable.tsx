@@ -1,13 +1,14 @@
 'use client'
 
 import { Partner } from '@/types'
-import { MoreHorizontal, Mail, Phone, MapPin } from 'lucide-react'
+import { MapPin, MoreHorizontal } from 'lucide-react'
 
 interface PartnerTableProps {
   partners: Partner[]
+  onRefresh?: () => void
 }
 
-export function PartnerTable({ partners }: PartnerTableProps) {
+export function PartnerTable({ partners, onRefresh }: PartnerTableProps) {
   return (
     <div className="bg-white dark:bg-slate-900 rounded-xl border shadow-sm overflow-hidden">
       <table className="w-full text-left border-collapse">
@@ -26,12 +27,13 @@ export function PartnerTable({ partners }: PartnerTableProps) {
               <td className="px-6 py-4">
                 <div className="flex flex-col">
                   <span className="font-semibold text-slate-900 dark:text-white">{partner.name}</span>
-                  <span className="text-xs text-slate-500">{partner.company_name}</span>
+                  <span className="text-xs text-slate-500">{partner.company_name || '—'}</span>
+                  <span className="text-xs text-slate-400">{partner.email}</span>
                 </div>
               </td>
               <td className="px-6 py-4">
                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${
-                  partner.status === 'active' ? 'bg-green-100 text-green-800' :
+                  partner.status === 'active'   ? 'bg-green-100 text-green-800' :
                   partner.status === 'inactive' ? 'bg-red-100 text-red-800' :
                   'bg-yellow-100 text-yellow-800'
                 }`}>
@@ -57,7 +59,7 @@ export function PartnerTable({ partners }: PartnerTableProps) {
           {partners.length === 0 && (
             <tr>
               <td colSpan={5} className="px-6 py-12 text-center text-slate-400 italic">
-                No partners found in the directory.
+                No partners found. Click "Add Partner" to get started.
               </td>
             </tr>
           )}

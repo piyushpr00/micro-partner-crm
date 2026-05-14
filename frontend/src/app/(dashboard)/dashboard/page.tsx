@@ -6,6 +6,7 @@ import { WalletCard } from '@/components/modules/analytics/WalletCard'
 import { Leaderboard } from '@/components/modules/analytics/Leaderboard'
 import { WalletService, AnalyticsService } from '@/services/partnerService'
 import { Loader2 } from 'lucide-react'
+import { formatINR, PAYOUT_TIMELINE_DAYS } from '@/types'
 
 export default function DashboardPage() {
   const [wallet, setWallet] = useState<any>(null)
@@ -26,13 +27,12 @@ export default function DashboardPage() {
         setLeaderboard(lbData)
         setAnalytics(statsData)
         
-        // Mock wallet for now since we need a partner ID
         setWallet({
-          balance: 4250.00,
-          total_earned: 15700.00,
+          balance: 425000,
+          total_earned: 1570000,
           payouts: [
-            { amount: 500, status: 'completed', created_at: new Date().toISOString() },
-            { amount: 1200, status: 'pending', created_at: new Date().toISOString() }
+            { amount: 50000, status: 'completed', created_at: new Date().toISOString() },
+            { amount: 120000, status: 'pending', created_at: new Date().toISOString() }
           ]
         })
       } catch (error) {
@@ -88,13 +88,13 @@ export default function DashboardPage() {
             </div>
             <div className="p-6 bg-white dark:bg-slate-900 rounded-xl border shadow-sm">
               <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Avg. Deal Value</p>
-              <h3 className="text-2xl font-bold text-indigo-600">$1,250</h3>
-              <p className="text-xs text-slate-400 font-medium mt-1">Stable vs last month</p>
+              <h3 className="text-2xl font-bold text-indigo-600">{formatINR(10000)}</h3>
+              <p className="text-xs text-slate-400 font-medium mt-1">Per closed deal</p>
             </div>
             <div className="p-6 bg-white dark:bg-slate-900 rounded-xl border shadow-sm">
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Payout Frequency</p>
-              <h3 className="text-2xl font-bold text-purple-600">14 Days</h3>
-              <p className="text-xs text-blue-600 font-medium mt-1">Faster than average</p>
+              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Payout Timeline</p>
+              <h3 className="text-2xl font-bold text-purple-600">{PAYOUT_TIMELINE_DAYS} Days</h3>
+              <p className="text-xs text-blue-600 font-medium mt-1">From request date</p>
             </div>
           </div>
         </div>

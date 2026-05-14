@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { PartnerTable } from '@/components/modules/partners/PartnerTable'
+import { PartnerForm } from '@/components/modules/partners/PartnerForm'
 import { PartnerService } from '@/services/partnerService'
 import { Partner } from '@/types'
 import { Plus, Download, Filter, Loader2 } from 'lucide-react'
@@ -9,6 +10,9 @@ import { Plus, Download, Filter, Loader2 } from 'lucide-react'
 export default function PartnersPage() {
   const [partners, setPartners] = useState<Partner[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [showForm, setShowForm] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [search, setSearch] = useState('')
 
   const fetchPartners = async () => {
     try {
@@ -22,12 +26,37 @@ export default function PartnersPage() {
     }
   }
 
-  useEffect(() => {
-    fetchPartners()
-  }, [])
+  useEffect(() => { fetchPartners() }, [])
+
+  const handleAddPartner = async (data: any) => {
+    try {
+      setIsSubmitting(true)
+      await PartnerService.createPartner(data)
+      setShowForm(false)
+      await fetchPartners()
+    } catch (error) {
+      console.error('Error creating partner:', error)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const filtered = partners.filter(p =>
+    p.name.toLowerCase().includes(search.toLowerCase()) ||
+    (p.company_name || '').toLowerCase().includes(search.toLowerCase()) ||
+    (p.region || '').toLowerCase().includes(search.toLowerCase())
+  )
 
   return (
     <div className="space-y-6">
+      {showForm && (
+        <PartnerForm
+          onSubmit={handleAddPartner}
+          onCancel={() => setShowForm(false)}
+          isSubmitting={isSubmitting}
+        />
+      )}
+
       <header className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Partner Directory</h1>
@@ -38,7 +67,10 @@ export default function PartnersPage() {
             <Download size={18} className="mr-2" />
             Export
           </button>
-          <button className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm">
+          <button
+            onClick={() => setShowForm(true)}
+            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm"
+          >
             <Plus size={18} className="mr-2" />
             Add Partner
           </button>
@@ -47,9 +79,11 @@ export default function PartnersPage() {
 
       <div className="flex items-center justify-between gap-4">
         <div className="flex-1 max-w-sm">
-          <input 
-            type="text" 
-            placeholder="Search partners..." 
+          <input
+            type="text"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search by name, company, region..."
             className="w-full px-4 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none dark:bg-slate-900 dark:border-slate-800"
           />
         </div>
@@ -64,7 +98,7 @@ export default function PartnersPage() {
           <Loader2 className="animate-spin text-blue-600" size={32} />
         </div>
       ) : (
-        <PartnerTable partners={partners} />
+        <PartnerTable partners={filtered} onRefresh={fetchPartners} />
       )}
     </div>
   )

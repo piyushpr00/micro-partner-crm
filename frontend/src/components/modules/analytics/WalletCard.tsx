@@ -1,6 +1,7 @@
 'use client'
 
 import { Wallet, ArrowUpRight, Clock, CheckCircle2 } from 'lucide-react'
+import { formatINR, PAYOUT_TIMELINE_DAYS } from '@/types'
 
 interface WalletCardProps {
   balance: number
@@ -22,19 +23,22 @@ export function WalletCard({ balance, totalEarned, payouts }: WalletCardProps) {
             </button>
           </div>
           <p className="text-blue-100 text-sm font-medium uppercase tracking-wider">Available Balance</p>
-          <h2 className="text-4xl font-bold mt-1">${balance.toLocaleString()}</h2>
-          <div className="mt-8 pt-6 border-t border-white/20 flex items-center justify-between">
+          <h2 className="text-4xl font-bold mt-1">{formatINR(balance)}</h2>
+          <div className="mt-6 flex items-center gap-2 text-blue-100 text-xs">
+            <Clock size={13} />
+            <span>Payout processed within {PAYOUT_TIMELINE_DAYS} days of request</span>
+          </div>
+          <div className="mt-4 pt-4 border-t border-white/20 flex items-center justify-between">
             <div>
               <p className="text-blue-100 text-xs font-medium uppercase">Total Earnings</p>
-              <p className="text-xl font-bold">${totalEarned.toLocaleString()}</p>
+              <p className="text-xl font-bold">{formatINR(totalEarned)}</p>
             </div>
             <div className="text-right">
-              <p className="text-blue-100 text-xs font-medium uppercase">Active Payouts</p>
+              <p className="text-blue-100 text-xs font-medium uppercase">Pending Payouts</p>
               <p className="text-xl font-bold">{payouts.filter(p => p.status === 'pending').length}</p>
             </div>
           </div>
         </div>
-        {/* Background Decorative Circles */}
         <div className="absolute -top-24 -right-24 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
         <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-blue-400/20 rounded-full blur-3xl"></div>
       </div>
@@ -60,10 +64,10 @@ export function WalletCard({ balance, totalEarned, payouts }: WalletCardProps) {
                   </div>
                   <div>
                     <p className="text-sm font-semibold">Payout Request</p>
-                    <p className="text-xs text-slate-500">{new Date(payout.created_at).toLocaleDateString()}</p>
+                    <p className="text-xs text-slate-500">{new Date(payout.created_at).toLocaleDateString('en-IN')}</p>
                   </div>
                 </div>
-                <p className="font-bold text-slate-900 dark:text-white">-${payout.amount}</p>
+                <p className="font-bold text-slate-900 dark:text-white">-{formatINR(payout.amount)}</p>
               </div>
             ))
           )}

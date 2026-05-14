@@ -3,7 +3,7 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import { Lead, LeadStatus } from '@/types'
+import { Lead, COMMISSION_SLABS } from '@/types'
 import { X } from 'lucide-react'
 
 const leadSchema = z.object({
@@ -13,6 +13,7 @@ const leadSchema = z.object({
   phone: z.string().optional(),
   source: z.string().optional(),
   status: z.enum(['new', 'contacted', 'qualified', 'proposal', 'negotiation', 'closed_won', 'closed_lost'] as const),
+  course_type: z.enum(['3_months', '4_months', '6_months', '11_months_diploma'] as const).optional(),
   notes: z.string().optional(),
   partner_id: z.string().min(1, 'Partner is required'),
 })
@@ -30,6 +31,7 @@ export function LeadForm({ initialData, onSubmit, onCancel, isSubmitting }: Lead
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<LeadFormValues>({
     resolver: zodResolver(leadSchema),
@@ -40,10 +42,14 @@ export function LeadForm({ initialData, onSubmit, onCancel, isSubmitting }: Lead
       phone: initialData?.phone || '',
       source: initialData?.source || '',
       status: initialData?.status || 'new',
+      course_type: initialData?.course_type || '3_months',
       notes: initialData?.notes || '',
       partner_id: initialData?.partner_id || '',
     },
   })
+
+  const selectedCourse = watch('course_type')
+  const slab = COMMISSION_SLABS.find(s => s.course_type === selectedCourse)
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -89,9 +95,30 @@ export function LeadForm({ initialData, onSubmit, onCancel, isSubmitting }: Lead
               <label className="text-xs font-semibold uppercase text-slate-500">Phone</label>
               <input
                 {...register('phone')}
+                placeholder="+91 98765 43210"
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none dark:bg-slate-800 dark:border-slate-700"
               />
             </div>
+          </div>
+
+          {/* Course Type — determines commission slab */}
+          <div className="space-y-1">
+            <label className="text-xs font-semibold uppercase text-slate-500">Course Interested In</label>
+            <select
+              {...register('course_type')}
+              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none dark:bg-slate-800 dark:border-slate-700"
+            >
+              {COMMISSION_SLABS.map(s => (
+                <option key={s.course_type} value={s.course_type}>
+                  {s.label} — {s.rate}% commission
+                </option>
+              ))}
+            </select>
+            {slab && (
+              <p className="text-xs text-blue-600 font-medium">
+                Commission: {slab.rate}% on deal value (₹{(10000 * slab.rate / 100).toLocaleString('en-IN')} per ₹10,000 deal)
+              </p>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">

@@ -1,6 +1,7 @@
 'use client'
 
 import { Trophy, Medal, Award } from 'lucide-react'
+import { formatINR } from '@/types'
 
 interface LeaderboardProps {
   data: any[]
@@ -42,7 +43,7 @@ export function Leaderboard({ data }: LeaderboardProps) {
             </div>
             <div className="text-right">
               <p className="text-sm font-bold text-blue-600">{partner.conversions} Deals</p>
-              <p className="text-xs text-slate-500">${partner.total_earned.toLocaleString()} earned</p>
+              <p className="text-xs text-slate-500">{formatINR(partner.total_earned)} earned</p>
             </div>
           </div>
         ))}
