@@ -25,9 +25,10 @@ interface LeadFormProps {
   onSubmit: (data: LeadFormValues) => void
   onCancel: () => void
   isSubmitting?: boolean
+  hidePartnerField?: boolean
 }
 
-export function LeadForm({ initialData, onSubmit, onCancel, isSubmitting }: LeadFormProps) {
+export function LeadForm({ initialData, onSubmit, onCancel, isSubmitting, hidePartnerField }: LeadFormProps) {
   const {
     register,
     handleSubmit,
@@ -137,15 +138,17 @@ export function LeadForm({ initialData, onSubmit, onCancel, isSubmitting }: Lead
                 <option value="closed_lost">Closed Lost</option>
               </select>
             </div>
-            <div className="space-y-1">
-              <label className="text-xs font-semibold uppercase text-slate-500">Partner ID</label>
-              <input
-                {...register('partner_id')}
-                placeholder="Partner UUID"
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none dark:bg-slate-800 dark:border-slate-700"
-              />
-              {errors.partner_id && <p className="text-xs text-red-500">{errors.partner_id.message}</p>}
-            </div>
+            {!hidePartnerField && (
+              <div className="space-y-1">
+                <label className="text-xs font-semibold uppercase text-slate-500">Partner ID</label>
+                <input
+                  {...register('partner_id')}
+                  placeholder="Partner UUID"
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none dark:bg-slate-800 dark:border-slate-700"
+                />
+                {errors.partner_id && <p className="text-xs text-red-500">{errors.partner_id.message}</p>}
+              </div>
+            )}
           </div>
 
           <div className="space-y-1">

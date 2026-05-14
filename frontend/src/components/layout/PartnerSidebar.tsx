@@ -4,12 +4,11 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import {
   LayoutDashboard,
-  Users,
   UserPlus,
-  Settings,
+  Wallet,
   LogOut,
   ChevronLeft,
-  Menu
+  Menu,
 } from 'lucide-react'
 import { useState } from 'react'
 import { clsx, type ClassValue } from 'clsx'
@@ -21,13 +20,12 @@ function cn(...inputs: ClassValue[]) {
 }
 
 const navItems = [
-  { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { label: 'Partners', href: '/partners', icon: Users },
-  { label: 'Leads', href: '/leads', icon: UserPlus },
-  { label: 'Settings', href: '/settings', icon: Settings },
+  { label: 'Dashboard', href: '/portal/dashboard', icon: LayoutDashboard },
+  { label: 'My Leads', href: '/portal/leads', icon: UserPlus },
+  { label: 'My Wallet', href: '/portal/wallet', icon: Wallet },
 ]
 
-export function Sidebar() {
+export function PartnerSidebar() {
   const pathname = usePathname()
   const router = useRouter()
   const [isCollapsed, setIsCollapsed] = useState(false)
@@ -40,12 +38,17 @@ export function Sidebar() {
 
   return (
     <aside className={cn(
-      "h-screen bg-slate-900 text-white transition-all duration-300 flex flex-col",
-      isCollapsed ? "w-20" : "w-64"
+      'h-screen bg-slate-900 text-white transition-all duration-300 flex flex-col',
+      isCollapsed ? 'w-20' : 'w-64'
     )}>
       <div className="p-6 flex items-center justify-between">
-        {!isCollapsed && <span className="text-xl font-bold tracking-tight">SkillCircle</span>}
-        <button 
+        {!isCollapsed && (
+          <div>
+            <span className="text-xl font-bold tracking-tight">SkillCircle</span>
+            <p className="text-xs text-blue-400 font-medium mt-0.5">Partner Portal</p>
+          </div>
+        )}
+        <button
           onClick={() => setIsCollapsed(!isCollapsed)}
           className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors"
         >
@@ -61,11 +64,11 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-4 p-3 rounded-lg transition-colors group",
-                isActive ? "bg-blue-600 text-white" : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                'flex items-center gap-4 p-3 rounded-lg transition-colors group',
+                isActive ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-slate-800 hover:text-white'
               )}
             >
-              <item.icon size={22} className={cn(isActive ? "text-white" : "group-hover:text-white")} />
+              <item.icon size={22} className={cn(isActive ? 'text-white' : 'group-hover:text-white')} />
               {!isCollapsed && <span className="font-medium">{item.label}</span>}
             </Link>
           )
@@ -76,8 +79,8 @@ export function Sidebar() {
         <button
           onClick={handleLogout}
           className={cn(
-            "flex items-center gap-4 p-3 rounded-lg text-slate-400 hover:bg-red-900/20 hover:text-red-400 transition-colors w-full",
-            isCollapsed ? "justify-center" : ""
+            'flex items-center gap-4 p-3 rounded-lg text-slate-400 hover:bg-red-900/20 hover:text-red-400 transition-colors w-full',
+            isCollapsed ? 'justify-center' : ''
           )}
         >
           <LogOut size={22} />

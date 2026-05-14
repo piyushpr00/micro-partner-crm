@@ -21,11 +21,26 @@ export default function LoginPage() {
 
     try {
       if (mode === 'login') {
-        const { error } = await supabase.auth.signInWithPassword({ email, password })
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password })
         if (error) throw error
+
+        // Fetch role and redirect accordingly
+        const userId = data.user?.id
+        if (userId) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', userId)
+            .single()
+
+          const role = profile?.role ?? 'partner'
+          router.push(role === 'admin' || role === 'leader' ? '/dashboard' : '/portal/dashboard')
+        } else {
+          router.push('/dashboard')
+        }
       } else {
-        const { error } = await supabase.auth.signUp({ 
-          email, 
+        const { error } = await supabase.auth.signUp({
+          email,
           password,
           options: {
             emailRedirectTo: `${window.location.origin}/api/auth/callback`,
@@ -34,7 +49,6 @@ export default function LoginPage() {
         if (error) throw error
         alert('Check your email for the confirmation link!')
       }
-      router.push('/dashboard')
     } catch (err: any) {
       setError(err.message)
     } finally {
