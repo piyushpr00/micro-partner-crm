@@ -13,18 +13,10 @@ const partnerSchema = z.object({
   company_name: z.string().optional(),
   region: z.string().optional(),
   status: z.enum(['active', 'inactive', 'pending'] as const),
-  commission_rate: z.preprocess((v) => parseFloat(String(v)), z.number().min(0).max(100)),
+  commission_rate: z.number().min(0).max(100),
 })
 
-type PartnerFormValues = {
-  name: string
-  email: string
-  phone?: string
-  company_name?: string
-  region?: string
-  status: 'active' | 'inactive' | 'pending'
-  commission_rate: number
-}
+type PartnerFormValues = z.infer<typeof partnerSchema>
 
 interface PartnerFormProps {
   initialData?: Partial<Partner>
@@ -127,7 +119,7 @@ export function PartnerForm({ initialData, onSubmit, onCancel, isSubmitting }: P
               Override Commission Rate (%) — leave at 10 to use course-based slabs
             </label>
             <input
-              {...register('commission_rate')}
+              {...register('commission_rate', { valueAsNumber: true })}
               type="number"
               min="0"
               max="100"
