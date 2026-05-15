@@ -138,7 +138,9 @@ export function LeadForm({ initialData, onSubmit, onCancel, isSubmitting, hidePa
                 <option value="closed_lost">Closed Lost</option>
               </select>
             </div>
-            {!hidePartnerField && (
+            {hidePartnerField ? (
+              <input type="hidden" {...register('partner_id')} />
+            ) : (
               <div className="space-y-1">
                 <label className="text-xs font-semibold uppercase text-slate-500">Partner ID</label>
                 <input
