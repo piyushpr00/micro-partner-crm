@@ -49,7 +49,7 @@ export default function PortalWalletPage() {
   if (isLoading) {
     return (
       <div className="h-full flex items-center justify-center">
-        <Loader2 className="animate-spin text-blue-600" size={32} />
+        <Loader2 className="animate-spin" size={32} style={{ color: '#F4C400' }} />
       </div>
     )
   }
@@ -57,13 +57,13 @@ export default function PortalWalletPage() {
   return (
     <div className="space-y-8">
       <header>
-        <h1 className="text-3xl font-bold tracking-tight">My Wallet</h1>
+        <h1 className="text-3xl font-bold tracking-tight" style={{ color: '#041B4D' }}>My Wallet</h1>
         <p className="text-slate-500">Your commission earnings and payout summary.</p>
       </header>
 
       {/* Summary cards */}
       <div className="grid gap-6 sm:grid-cols-3">
-        <div className="p-6 bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-xl shadow-lg">
+        <div className="p-6 rounded-xl shadow-lg text-white" style={{ background: 'linear-gradient(135deg, #041B4D 0%, #0B2E6D 100%)' }}>
           <div className="flex items-center gap-2 mb-4 opacity-80">
             <IndianRupee size={18} />
             <span className="text-sm font-semibold uppercase tracking-wider">Total Earned</span>
@@ -73,20 +73,20 @@ export default function PortalWalletPage() {
         </div>
 
         <div className="p-6 bg-white dark:bg-slate-900 rounded-xl border shadow-sm">
-          <div className="flex items-center gap-2 mb-4 text-amber-600">
+          <div className="flex items-center gap-2 mb-4" style={{ color: '#F4C400' }}>
             <TrendingUp size={18} />
             <span className="text-sm font-semibold uppercase tracking-wider">Potential</span>
           </div>
-          <p className="text-3xl font-bold text-amber-600">{formatINR(pendingCommission)}</p>
+          <p className="text-3xl font-bold" style={{ color: '#F4C400' }}>{formatINR(pendingCommission)}</p>
           <p className="text-sm text-slate-400 mt-1">From active pipeline</p>
         </div>
 
         <div className="p-6 bg-white dark:bg-slate-900 rounded-xl border shadow-sm">
-          <div className="flex items-center gap-2 mb-4 text-purple-600">
+          <div className="flex items-center gap-2 mb-4" style={{ color: '#041B4D' }}>
             <Clock size={18} />
             <span className="text-sm font-semibold uppercase tracking-wider">Payout Timeline</span>
           </div>
-          <p className="text-3xl font-bold text-purple-600">{PAYOUT_TIMELINE_DAYS} days</p>
+          <p className="text-3xl font-bold" style={{ color: '#041B4D' }}>{PAYOUT_TIMELINE_DAYS} days</p>
           <p className="text-sm text-slate-400 mt-1">From payout request</p>
         </div>
       </div>
