@@ -22,7 +22,8 @@ export default function PartnersPage() {
       .from('partners')
       .select('*')
       .order('created_at', { ascending: false })
-    if (!error) setPartners(data ?? [])
+    if (error) setSubmitError(`Fetch error: ${error.code} — ${error.message}`)
+    else setPartners(data ?? [])
     setIsLoading(false)
   }, [])
 
