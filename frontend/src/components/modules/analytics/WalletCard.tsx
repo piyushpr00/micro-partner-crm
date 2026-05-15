@@ -12,13 +12,13 @@ interface WalletCardProps {
 export function WalletCard({ balance, totalEarned, payouts }: WalletCardProps) {
   return (
     <div className="grid gap-6 md:grid-cols-2">
-      <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl p-8 text-white shadow-lg relative overflow-hidden">
+      <div className="rounded-2xl p-8 text-white shadow-lg relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #041B4D 0%, #0B2E6D 100%)' }}>
         <div className="relative z-10">
           <div className="flex items-center justify-between mb-8">
             <div className="p-3 bg-white/20 rounded-xl backdrop-blur-md">
               <Wallet size={24} />
             </div>
-            <button className="px-4 py-2 bg-white text-blue-600 rounded-lg text-sm font-bold hover:bg-blue-50 transition-colors">
+            <button className="px-4 py-2 rounded-lg text-sm font-bold transition-colors" style={{ background: '#F4C400', color: '#041B4D' }}>
               Withdraw
             </button>
           </div>

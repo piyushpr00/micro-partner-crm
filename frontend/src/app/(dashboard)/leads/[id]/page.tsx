@@ -68,7 +68,11 @@ export default function LeadDetailsPage() {
           <ArrowLeft size={20} className="mr-2" />
           Back to Leads
         </button>
-        <button className="flex items-center px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors">
+        <button
+          onClick={() => router.push(`/leads?edit=${lead.id}`)}
+          className="flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          style={{ background: '#F4C400', color: '#041B4D' }}
+        >
           <Edit size={16} className="mr-2" />
           Edit Lead
         </button>
