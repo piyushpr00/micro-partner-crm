@@ -23,7 +23,7 @@ export default async function DashboardLayout({
   if (role === 'partner') redirect('/portal/dashboard')
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50 dark:bg-slate-950">
+    <div className="flex h-screen overflow-hidden" style={{ background: '#F0F4FA' }}>
       <Sidebar />
       <div className="flex flex-col flex-1 overflow-hidden">
         <Topbar />

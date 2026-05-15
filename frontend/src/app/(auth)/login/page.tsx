@@ -3,7 +3,13 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { LayoutDashboard, Mail, Lock, Loader2, ArrowRight } from 'lucide-react'
+import { Mail, Lock, Loader2, ArrowRight, TrendingUp, Users, IndianRupee } from 'lucide-react'
+
+const highlights = [
+  { icon: Users,        text: 'Manage your entire partner network' },
+  { icon: TrendingUp,   text: 'Track leads through every pipeline stage' },
+  { icon: IndianRupee,  text: 'Automatic commission calculations in INR' },
+]
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -24,7 +30,6 @@ export default function LoginPage() {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password })
         if (error) throw error
 
-        // Fetch role and redirect accordingly
         const userId = data.user?.id
         if (userId) {
           const { data: profile } = await supabase
@@ -57,78 +62,152 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-4">
-      <div className="w-full max-w-md space-y-8 bg-white dark:bg-slate-900 p-8 rounded-2xl border shadow-xl">
-        <div className="text-center">
-          <div className="mx-auto w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white mb-4 shadow-lg">
-            <LayoutDashboard size={28} />
+    <div className="min-h-screen flex">
+      {/* Left panel */}
+      <div
+        className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12"
+        style={{ background: 'linear-gradient(135deg, #041B4D 0%, #0B2E6D 100%)' }}
+      >
+        {/* Logo */}
+        <div className="flex items-center gap-3">
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-base"
+            style={{ background: '#F4C400', color: '#041B4D' }}
+          >
+            SC
           </div>
-          <h2 className="text-3xl font-bold tracking-tight">SkillCircle CRM</h2>
-          <p className="text-slate-500 mt-2">
-            {mode === 'login' ? 'Welcome back! Please enter your details.' : 'Create your micro partner account.'}
-          </p>
+          <div>
+            <p className="font-bold text-white text-lg leading-tight">SkillCircle</p>
+            <p className="text-[11px] uppercase tracking-widest" style={{ color: '#F4C400' }}>
+              Partner CRM
+            </p>
+          </div>
         </div>
 
-        {error && (
-          <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 rounded-lg text-sm text-red-600 text-center">
-            {error}
+        {/* Hero text */}
+        <div className="space-y-8">
+          <div>
+            <h1 className="text-4xl font-bold text-white leading-tight mb-4">
+              Grow your network.<br />
+              <span style={{ color: '#F4C400' }}>Track every rupee.</span>
+            </h1>
+            <p className="text-white/60 text-lg">
+              The all-in-one CRM built for SkillCircle micro-partners to manage leads, commissions, and payouts.
+            </p>
           </div>
-        )}
 
-        <form onSubmit={handleAuth} className="space-y-4">
-          <div className="space-y-1">
-            <label className="text-xs font-semibold uppercase text-slate-500 ml-1">Email Address</label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none dark:bg-slate-800 dark:border-slate-700 transition-all"
-                placeholder="name@company.com"
-              />
+          <ul className="space-y-4">
+            {highlights.map(({ icon: Icon, text }) => (
+              <li key={text} className="flex items-center gap-3">
+                <div
+                  className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                  style={{ background: 'rgba(244,196,0,0.15)' }}
+                >
+                  <Icon size={16} style={{ color: '#F4C400' }} />
+                </div>
+                <span className="text-white/80 text-sm">{text}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Footer */}
+        <p className="text-white/30 text-xs">© 2025 SkillCircle. All rights reserved.</p>
+      </div>
+
+      {/* Right panel — form */}
+      <div className="flex-1 flex items-center justify-center p-8 bg-white">
+        <div className="w-full max-w-md space-y-8">
+          {/* Mobile logo */}
+          <div className="flex items-center gap-2.5 lg:hidden">
+            <div
+              className="w-9 h-9 rounded-xl flex items-center justify-center font-black text-sm"
+              style={{ background: '#041B4D', color: '#F4C400' }}
+            >
+              SC
             </div>
+            <span className="font-bold text-xl" style={{ color: '#041B4D' }}>SkillCircle CRM</span>
           </div>
 
-          <div className="space-y-1">
-            <label className="text-xs font-semibold uppercase text-slate-500 ml-1">Password</label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none dark:bg-slate-800 dark:border-slate-700 transition-all"
-                placeholder="••••••••"
-              />
+          <div>
+            <h2 className="text-3xl font-bold" style={{ color: '#041B4D' }}>
+              {mode === 'login' ? 'Welcome back' : 'Create account'}
+            </h2>
+            <p className="text-slate-500 mt-1 text-sm">
+              {mode === 'login'
+                ? 'Sign in to your CRM dashboard'
+                : 'Join as a SkillCircle micro-partner'}
+            </p>
+          </div>
+
+          {error && (
+            <div className="p-3 bg-red-50 border border-red-100 rounded-xl text-sm text-red-600">
+              {error}
             </div>
+          )}
+
+          <form onSubmit={handleAuth} className="space-y-5">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                Email Address
+              </label>
+              <div className="relative">
+                <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="name@company.com"
+                  className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl text-sm outline-none transition-all focus:border-[#041B4D] focus:ring-2 focus:ring-[#041B4D]/10"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                Password
+              </label>
+              <div className="relative">
+                <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="password"
+                  required
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl text-sm outline-none transition-all focus:border-[#041B4D] focus:ring-2 focus:ring-[#041B4D]/10"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 group transition-all disabled:opacity-60 shadow-lg"
+              style={{ background: '#F4C400', color: '#041B4D', boxShadow: '0 4px 20px rgba(244,196,0,0.35)' }}
+            >
+              {isLoading ? (
+                <Loader2 className="animate-spin" size={18} />
+              ) : (
+                <>
+                  {mode === 'login' ? 'Sign In' : 'Create Account'}
+                  <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                </>
+              )}
+            </button>
+          </form>
+
+          <div className="text-center">
+            <button
+              onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
+              className="text-sm text-slate-500 hover:text-[#041B4D] transition-colors font-medium"
+            >
+              {mode === 'login'
+                ? "Don't have an account? Sign up"
+                : 'Already have an account? Sign in'}
+            </button>
           </div>
-
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition-all flex items-center justify-center gap-2 group shadow-lg shadow-blue-500/20"
-          >
-            {isLoading ? (
-              <Loader2 className="animate-spin" size={20} />
-            ) : (
-              <>
-                {mode === 'login' ? 'Sign In' : 'Create Account'}
-                <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-              </>
-            )}
-          </button>
-        </form>
-
-        <div className="text-center pt-4">
-          <button
-            onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
-            className="text-sm text-slate-500 hover:text-blue-600 transition-colors"
-          >
-            {mode === 'login' ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
-          </button>
         </div>
       </div>
     </div>

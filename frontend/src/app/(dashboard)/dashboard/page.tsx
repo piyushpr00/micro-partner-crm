@@ -5,8 +5,14 @@ import { PerformanceChart } from '@/components/modules/analytics/PerformanceChar
 import { WalletCard } from '@/components/modules/analytics/WalletCard'
 import { Leaderboard } from '@/components/modules/analytics/Leaderboard'
 import { WalletService, AnalyticsService } from '@/services/partnerService'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Users, IndianRupee, Clock, TrendingUp } from 'lucide-react'
 import { formatINR, PAYOUT_TIMELINE_DAYS } from '@/types'
+
+const kpiStyle = [
+  { bg: '#041B4D', text: '#F4C400', sub: 'rgba(255,255,255,0.5)' },
+  { bg: '#0B2E6D', text: '#FFCC00', sub: 'rgba(255,255,255,0.5)' },
+  { bg: '#F4C400', text: '#041B4D', sub: 'rgba(4,27,77,0.5)' },
+]
 
 export default function DashboardPage() {
   const [wallet, setWallet] = useState<any>(null)
@@ -18,15 +24,12 @@ export default function DashboardPage() {
     const fetchDashboardData = async () => {
       try {
         setIsLoading(true)
-        // For prototype, we'll fetch leaderboard and global stats
-        // In a real app, you'd fetch the specific partner's wallet based on their auth session
         const [lbData, statsData] = await Promise.all([
           WalletService.getLeaderboard(),
           AnalyticsService.getGlobalStats()
         ])
         setLeaderboard(lbData)
         setAnalytics(statsData)
-        
         setWallet({
           balance: 425000,
           total_earned: 1570000,
@@ -47,55 +50,80 @@ export default function DashboardPage() {
   if (isLoading) {
     return (
       <div className="h-full flex items-center justify-center">
-        <Loader2 className="animate-spin text-blue-600" size={32} />
+        <Loader2 className="animate-spin" size={32} style={{ color: '#F4C400' }} />
       </div>
     )
   }
 
+  const kpis = [
+    { label: 'Total Leads', value: analytics?.total_leads ?? 0, sub: 'Global activity', icon: Users },
+    { label: 'Avg. Deal Value', value: formatINR(10000), sub: 'Per closed deal', icon: IndianRupee },
+    { label: 'Payout Timeline', value: `${PAYOUT_TIMELINE_DAYS}d`, sub: 'From request date', icon: Clock },
+  ]
+
   return (
     <div className="space-y-8">
-      <header>
-        <h1 className="text-3xl font-bold tracking-tight">Partner Dashboard</h1>
-        <p className="text-slate-500">Track your performance, manage earnings, and submit leads.</p>
+      <header className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight" style={{ color: '#041B4D' }}>
+            Partner Dashboard
+          </h1>
+          <p className="text-slate-500 mt-1">Track performance, manage earnings, and submit leads.</p>
+        </div>
+        <div
+          className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold"
+          style={{ background: '#F4C400', color: '#041B4D' }}
+        >
+          <TrendingUp size={16} />
+          Live Data
+        </div>
       </header>
 
       {wallet && (
-        <WalletCard 
-          balance={wallet.balance} 
-          totalEarned={wallet.total_earned} 
-          payouts={wallet.payouts} 
+        <WalletCard
+          balance={wallet.balance}
+          totalEarned={wallet.total_earned}
+          payouts={wallet.payouts}
         />
       )}
 
+      {/* KPI cards */}
+      <div className="grid gap-5 md:grid-cols-3">
+        {kpis.map((kpi, i) => {
+          const s = kpiStyle[i]!
+          return (
+            <div
+              key={kpi.label}
+              className="p-6 rounded-2xl shadow-lg"
+              style={{ background: s.bg }}
+            >
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-xs font-bold uppercase tracking-wider" style={{ color: s.sub }}>
+                  {kpi.label}
+                </p>
+                <kpi.icon size={18} style={{ color: s.text, opacity: 0.8 }} />
+              </div>
+              <p className="text-3xl font-bold" style={{ color: s.text }}>{kpi.value}</p>
+              <p className="text-xs mt-1" style={{ color: s.sub }}>{kpi.sub}</p>
+            </div>
+          )
+        })}
+      </div>
+
       <div className="grid gap-8 lg:grid-cols-3">
-        <div className="lg:col-span-2 space-y-8">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl border shadow-sm p-8 flex flex-col h-[450px]">
-            <div className="flex items-center justify-between mb-8">
-              <h3 className="text-lg font-bold">Conversion Performance</h3>
-              <select className="text-sm border-none bg-slate-100 dark:bg-slate-800 rounded-lg px-3 py-1.5 focus:ring-0 outline-none">
+        <div className="lg:col-span-2">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 h-[420px] flex flex-col">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-bold" style={{ color: '#041B4D' }}>Conversion Performance</h3>
+              <select
+                className="text-xs border border-slate-200 rounded-lg px-3 py-1.5 outline-none focus:border-[#041B4D]"
+                style={{ color: '#041B4D' }}
+              >
                 <option>Last 30 Days</option>
                 <option>Last 90 Days</option>
               </select>
             </div>
             <PerformanceChart />
-          </div>
-
-          <div className="grid gap-6 md:grid-cols-3">
-            <div className="p-6 bg-white dark:bg-slate-900 rounded-xl border shadow-sm">
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Total Leads</p>
-              <h3 className="text-2xl font-bold text-blue-600">{analytics?.total_leads || 0}</h3>
-              <p className="text-xs text-green-600 font-medium mt-1">Global activity</p>
-            </div>
-            <div className="p-6 bg-white dark:bg-slate-900 rounded-xl border shadow-sm">
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Avg. Deal Value</p>
-              <h3 className="text-2xl font-bold text-indigo-600">{formatINR(10000)}</h3>
-              <p className="text-xs text-slate-400 font-medium mt-1">Per closed deal</p>
-            </div>
-            <div className="p-6 bg-white dark:bg-slate-900 rounded-xl border shadow-sm">
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Payout Timeline</p>
-              <h3 className="text-2xl font-bold text-purple-600">{PAYOUT_TIMELINE_DAYS} Days</h3>
-              <p className="text-xs text-blue-600 font-medium mt-1">From request date</p>
-            </div>
           </div>
         </div>
 

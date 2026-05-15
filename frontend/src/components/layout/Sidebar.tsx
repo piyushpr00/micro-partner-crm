@@ -9,7 +9,7 @@ import {
   Settings,
   LogOut,
   ChevronLeft,
-  Menu
+  Menu,
 } from 'lucide-react'
 import { useState } from 'react'
 import { clsx, type ClassValue } from 'clsx'
@@ -22,9 +22,9 @@ function cn(...inputs: ClassValue[]) {
 
 const navItems = [
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { label: 'Partners', href: '/partners', icon: Users },
-  { label: 'Leads', href: '/leads', icon: UserPlus },
-  { label: 'Settings', href: '/settings', icon: Settings },
+  { label: 'Partners',  href: '/partners',  icon: Users },
+  { label: 'Leads',     href: '/leads',     icon: UserPlus },
+  { label: 'Settings',  href: '/settings',  icon: Settings },
 ]
 
 export function Sidebar() {
@@ -39,21 +39,46 @@ export function Sidebar() {
   }
 
   return (
-    <aside className={cn(
-      "h-screen bg-slate-900 text-white transition-all duration-300 flex flex-col",
-      isCollapsed ? "w-20" : "w-64"
-    )}>
-      <div className="p-6 flex items-center justify-between">
-        {!isCollapsed && <span className="text-xl font-bold tracking-tight">SkillCircle</span>}
-        <button 
+    <aside
+      style={{ background: 'linear-gradient(180deg, #041B4D 0%, #0B2E6D 100%)' }}
+      className={cn(
+        'h-screen text-white transition-all duration-300 flex flex-col shadow-2xl',
+        isCollapsed ? 'w-20' : 'w-64'
+      )}
+    >
+      {/* Logo */}
+      <div className="px-5 py-6 flex items-center justify-between border-b border-white/10">
+        {!isCollapsed && (
+          <div className="flex items-center gap-2.5">
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center font-black text-sm"
+              style={{ background: '#F4C400', color: '#041B4D' }}
+            >
+              SC
+            </div>
+            <div>
+              <p className="font-bold text-base leading-tight">SkillCircle</p>
+              <p className="text-[10px] uppercase tracking-widest" style={{ color: '#F4C400' }}>
+                CRM Admin
+              </p>
+            </div>
+          </div>
+        )}
+        <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors"
+          className="p-1.5 rounded-lg transition-colors hover:bg-white/10"
         >
           {isCollapsed ? <Menu size={20} /> : <ChevronLeft size={20} />}
         </button>
       </div>
 
-      <nav className="flex-1 px-4 space-y-2 mt-4">
+      {/* Nav */}
+      <nav className="flex-1 px-3 py-4 space-y-1">
+        {!isCollapsed && (
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-white/30 px-3 mb-3">
+            Navigation
+          </p>
+        )}
         {navItems.map((item) => {
           const isActive = pathname === item.href
           return (
@@ -61,27 +86,41 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-4 p-3 rounded-lg transition-colors group",
-                isActive ? "bg-blue-600 text-white" : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                'flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group relative',
+                isActive
+                  ? 'shadow-lg'
+                  : 'text-white/60 hover:text-white hover:bg-white/10'
               )}
+              style={isActive ? { background: '#F4C400', color: '#041B4D' } : {}}
             >
-              <item.icon size={22} className={cn(isActive ? "text-white" : "group-hover:text-white")} />
-              {!isCollapsed && <span className="font-medium">{item.label}</span>}
+              {isActive && (
+                <span
+                  className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 rounded-r-full"
+                  style={{ background: '#041B4D', opacity: 0.3 }}
+                />
+              )}
+              <item.icon size={20} className={cn('flex-shrink-0', isActive ? '' : 'group-hover:text-white')} />
+              {!isCollapsed && (
+                <span className={cn('font-semibold text-sm', isActive ? 'text-[#041B4D]' : '')}>
+                  {item.label}
+                </span>
+              )}
             </Link>
           )
         })}
       </nav>
 
-      <div className="p-4 border-t border-slate-800">
+      {/* Logout */}
+      <div className="px-3 py-4 border-t border-white/10">
         <button
           onClick={handleLogout}
           className={cn(
-            "flex items-center gap-4 p-3 rounded-lg text-slate-400 hover:bg-red-900/20 hover:text-red-400 transition-colors w-full",
-            isCollapsed ? "justify-center" : ""
+            'flex items-center gap-3 px-3 py-2.5 rounded-xl text-white/50 hover:text-red-300 hover:bg-red-500/10 transition-all w-full',
+            isCollapsed ? 'justify-center' : ''
           )}
         >
-          <LogOut size={22} />
-          {!isCollapsed && <span className="font-medium">Logout</span>}
+          <LogOut size={20} className="flex-shrink-0" />
+          {!isCollapsed && <span className="font-semibold text-sm">Logout</span>}
         </button>
       </div>
     </aside>
