@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { createClient } from '@/lib/supabase/client'
 import { PartnerTable } from '@/components/modules/partners/PartnerTable'
 import { PartnerForm } from '@/components/modules/partners/PartnerForm'
-import { PartnerService } from '@/services/partnerService'
 import { Partner } from '@/types'
 import { Plus, Download, Filter, Loader2 } from 'lucide-react'
 
@@ -12,33 +12,34 @@ export default function PartnersPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
 
-  const fetchPartners = async () => {
-    try {
-      setIsLoading(true)
-      const data = await PartnerService.getAllPartners()
-      setPartners(data)
-    } catch (error) {
-      console.error('Error fetching partners:', error)
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  const fetchPartners = useCallback(async () => {
+    const supabase = createClient()
+    setIsLoading(true)
+    const { data, error } = await supabase
+      .from('partners')
+      .select('*')
+      .order('created_at', { ascending: false })
+    if (!error) setPartners(data ?? [])
+    setIsLoading(false)
+  }, [])
 
-  useEffect(() => { fetchPartners() }, [])
+  useEffect(() => { fetchPartners() }, [fetchPartners])
 
   const handleAddPartner = async (data: any) => {
-    try {
-      setIsSubmitting(true)
-      await PartnerService.createPartner(data)
+    setIsSubmitting(true)
+    setSubmitError(null)
+    const supabase = createClient()
+    const { error } = await supabase.from('partners').insert([data])
+    if (error) {
+      setSubmitError(error.message)
+    } else {
       setShowForm(false)
       await fetchPartners()
-    } catch (error) {
-      console.error('Error creating partner:', error)
-    } finally {
-      setIsSubmitting(false)
     }
+    setIsSubmitting(false)
   }
 
   const filtered = partners.filter(p =>
@@ -52,14 +53,14 @@ export default function PartnersPage() {
       {showForm && (
         <PartnerForm
           onSubmit={handleAddPartner}
-          onCancel={() => setShowForm(false)}
+          onCancel={() => { setShowForm(false); setSubmitError(null) }}
           isSubmitting={isSubmitting}
         />
       )}
 
       <header className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Partner Directory</h1>
+          <h1 className="text-3xl font-bold tracking-tight" style={{ color: '#041B4D' }}>Partner Directory</h1>
           <p className="text-slate-500">Manage and track your SkillCircle micro partners.</p>
         </div>
         <div className="flex items-center gap-3">
@@ -68,7 +69,7 @@ export default function PartnersPage() {
             Export
           </button>
           <button
-            onClick={() => setShowForm(true)}
+            onClick={() => { setSubmitError(null); setShowForm(true) }}
             className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-bold transition-colors shadow-sm"
             style={{ background: '#F4C400', color: '#041B4D' }}
           >
@@ -77,6 +78,12 @@ export default function PartnersPage() {
           </button>
         </div>
       </header>
+
+      {submitError && (
+        <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+          Error saving partner: {submitError}
+        </div>
+      )}
 
       <div className="flex items-center justify-between gap-4">
         <div className="flex-1 max-w-sm">
@@ -96,7 +103,7 @@ export default function PartnersPage() {
 
       {isLoading ? (
         <div className="h-64 flex items-center justify-center">
-          <Loader2 className="animate-spin text-blue-600" size={32} />
+          <Loader2 className="animate-spin" size={32} style={{ color: '#F4C400' }} />
         </div>
       ) : (
         <PartnerTable partners={filtered} onRefresh={fetchPartners} />

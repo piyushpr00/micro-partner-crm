@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { createClient } from '@/lib/supabase/client'
 import { LeadTable } from '@/components/modules/leads/LeadTable'
 import { LeadForm } from '@/components/modules/leads/LeadForm'
 import { ImportModal } from '@/components/modules/leads/ImportModal'
-import { LeadService } from '@/services/leadService'
 import { Lead } from '@/types'
 import { Plus, Filter, Loader2, Upload } from 'lucide-react'
 
@@ -18,96 +18,90 @@ export default function LeadsPage() {
   const [isImportOpen, setIsImportOpen] = useState(false)
   const [editingLead, setEditingLead] = useState<Lead | undefined>()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
-  const fetchLeads = async () => {
-    try {
-      setIsLoading(true)
-      const data = await LeadService.getAllLeads()
-      setLeads(data)
-    } catch (error) {
-      console.error('Error fetching leads:', error)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    fetchLeads()
+  const fetchLeads = useCallback(async () => {
+    const supabase = createClient()
+    setIsLoading(true)
+    const { data, error } = await supabase
+      .from('leads')
+      .select('*')
+      .order('created_at', { ascending: false })
+    if (!error) setLeads(data ?? [])
+    setIsLoading(false)
   }, [])
 
   useEffect(() => {
+    fetchLeads()
+  }, [fetchLeads])
+
+  useEffect(() => {
     let result = leads
-    if (statusFilter !== 'all') {
-      result = result.filter(lead => lead.status === statusFilter)
-    }
+    if (statusFilter !== 'all') result = result.filter(l => l.status === statusFilter)
     if (searchQuery) {
-      const query = searchQuery.toLowerCase()
-      result = result.filter(lead => 
-        `${lead.first_name} ${lead.last_name}`.toLowerCase().includes(query) ||
-        lead.email.toLowerCase().includes(query)
+      const q = searchQuery.toLowerCase()
+      result = result.filter(l =>
+        `${l.first_name} ${l.last_name}`.toLowerCase().includes(q) ||
+        l.email.toLowerCase().includes(q)
       )
     }
     setFilteredLeads(result)
   }, [statusFilter, searchQuery, leads])
 
   const handleCreateLead = async (data: any) => {
-    try {
-      setIsSubmitting(true)
-      await LeadService.createLead(data)
+    setIsSubmitting(true)
+    setSubmitError(null)
+    const supabase = createClient()
+    const { error } = await supabase.from('leads').insert([data])
+    if (error) {
+      setSubmitError(error.message)
+    } else {
       await fetchLeads()
       setIsFormOpen(false)
-    } catch (error) {
-      console.error('Error creating lead:', error)
-    } finally {
-      setIsSubmitting(false)
     }
+    setIsSubmitting(false)
   }
 
   const handleUpdateLead = async (data: any) => {
     if (!editingLead) return
-    try {
-      setIsSubmitting(true)
-      await LeadService.updateLead(editingLead.id, data)
+    setIsSubmitting(true)
+    setSubmitError(null)
+    const supabase = createClient()
+    const { error } = await supabase.from('leads').update(data).eq('id', editingLead.id)
+    if (error) {
+      setSubmitError(error.message)
+    } else {
       await fetchLeads()
       setIsFormOpen(false)
       setEditingLead(undefined)
-    } catch (error) {
-      console.error('Error updating lead:', error)
-    } finally {
-      setIsSubmitting(false)
     }
+    setIsSubmitting(false)
   }
 
   const handleDeleteLead = async (id: string) => {
     if (!confirm('Are you sure you want to delete this lead?')) return
-    try {
-      await LeadService.deleteLead(id)
-      await fetchLeads()
-    } catch (error) {
-      console.error('Error deleting lead:', error)
-    }
+    const supabase = createClient()
+    const { error } = await supabase.from('leads').delete().eq('id', id)
+    if (!error) fetchLeads()
   }
 
   return (
     <div className="space-y-6">
       <header className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Lead Management</h1>
+          <h1 className="text-3xl font-bold tracking-tight" style={{ color: '#041B4D' }}>Lead Management</h1>
           <p className="text-slate-500">Track and convert potential leads into successful partners.</p>
         </div>
         <div className="flex items-center gap-3">
-          <button 
+          <button
             onClick={() => setIsImportOpen(true)}
             className="inline-flex items-center px-4 py-2 border rounded-lg text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
           >
             <Upload size={18} className="mr-2" />
             Import
           </button>
-          <button 
-            onClick={() => {
-              setEditingLead(undefined)
-              setIsFormOpen(true)
-            }}
+          <button
+            onClick={() => { setEditingLead(undefined); setSubmitError(null); setIsFormOpen(true) }}
             className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-bold transition-colors shadow-sm"
             style={{ background: '#F4C400', color: '#041B4D' }}
           >
@@ -117,20 +111,26 @@ export default function LeadsPage() {
         </div>
       </header>
 
+      {submitError && (
+        <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+          Error saving lead: {submitError}
+        </div>
+      )}
+
       <div className="flex items-center justify-between gap-4">
         <div className="flex-1 max-w-sm">
-          <input 
-            type="text" 
-            placeholder="Search by name or email..." 
+          <input
+            type="text"
+            placeholder="Search by name or email..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={e => setSearchQuery(e.target.value)}
             className="w-full px-4 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none dark:bg-slate-900 dark:border-slate-800"
           />
         </div>
         <div className="flex items-center gap-3">
-          <select 
+          <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+            onChange={e => setStatusFilter(e.target.value)}
             className="px-4 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none dark:bg-slate-900 dark:border-slate-800"
           >
             <option value="all">All Statuses</option>
@@ -147,15 +147,12 @@ export default function LeadsPage() {
 
       {isLoading ? (
         <div className="h-64 flex items-center justify-center">
-          <Loader2 className="animate-spin text-blue-600" size={32} />
+          <Loader2 className="animate-spin" size={32} style={{ color: '#F4C400' }} />
         </div>
       ) : (
-        <LeadTable 
-          leads={filteredLeads} 
-          onEdit={(lead) => {
-            setEditingLead(lead)
-            setIsFormOpen(true)
-          }}
+        <LeadTable
+          leads={filteredLeads}
+          onEdit={lead => { setEditingLead(lead); setSubmitError(null); setIsFormOpen(true) }}
           onDelete={handleDeleteLead}
         />
       )}
@@ -164,10 +161,7 @@ export default function LeadsPage() {
         <LeadForm
           initialData={editingLead}
           onSubmit={editingLead ? handleUpdateLead : handleCreateLead}
-          onCancel={() => {
-            setIsFormOpen(false)
-            setEditingLead(undefined)
-          }}
+          onCancel={() => { setIsFormOpen(false); setEditingLead(undefined) }}
           isSubmitting={isSubmitting}
         />
       )}
@@ -175,10 +169,7 @@ export default function LeadsPage() {
       {isImportOpen && (
         <ImportModal
           onClose={() => setIsImportOpen(false)}
-          onSuccess={() => {
-            fetchLeads()
-            setIsImportOpen(false)
-          }}
+          onSuccess={() => { fetchLeads(); setIsImportOpen(false) }}
         />
       )}
     </div>
