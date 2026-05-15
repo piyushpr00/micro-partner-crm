@@ -22,11 +22,7 @@ export default function PartnersPage() {
       .from('partners')
       .select('*')
       .order('created_at', { ascending: false })
-    if (error) {
-      setSubmitError(`Fetch error: ${error.message}`)
-    } else {
-      setPartners(data ?? [])
-    }
+    if (!error) setPartners(data ?? [])
     setIsLoading(false)
   }, [])
 
