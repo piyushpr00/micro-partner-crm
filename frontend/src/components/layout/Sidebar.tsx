@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import {
   LayoutDashboard,
@@ -47,26 +48,30 @@ export function Sidebar() {
       )}
     >
       {/* Logo */}
-      <div className="px-5 py-6 flex items-center justify-between border-b border-white/10">
+      <div className="px-5 py-5 flex items-center justify-between border-b border-white/10">
         {!isCollapsed && (
-          <div className="flex items-center gap-2.5">
-            <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center font-black text-sm"
-              style={{ background: '#F4C400', color: '#041B4D' }}
-            >
-              SC
-            </div>
-            <div>
-              <p className="font-bold text-base leading-tight">SkillCircle</p>
-              <p className="text-[10px] uppercase tracking-widest" style={{ color: '#F4C400' }}>
-                CRM Admin
-              </p>
-            </div>
-          </div>
+          <Image
+            src="/logo-white.png"
+            alt="SkillCircle"
+            width={140}
+            height={40}
+            className="object-contain"
+            priority
+          />
+        )}
+        {isCollapsed && (
+          <Image
+            src="/logo-white.png"
+            alt="SkillCircle"
+            width={32}
+            height={32}
+            className="object-contain"
+            priority
+          />
         )}
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="p-1.5 rounded-lg transition-colors hover:bg-white/10"
+          className="p-1.5 rounded-lg transition-colors hover:bg-white/10 ml-auto"
         >
           {isCollapsed ? <Menu size={20} /> : <ChevronLeft size={20} />}
         </button>

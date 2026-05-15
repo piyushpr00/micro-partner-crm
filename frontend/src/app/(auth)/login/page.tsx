@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { Mail, Lock, Loader2, ArrowRight, TrendingUp, Users, IndianRupee } from 'lucide-react'
@@ -69,20 +70,14 @@ export default function LoginPage() {
         style={{ background: 'linear-gradient(135deg, #041B4D 0%, #0B2E6D 100%)' }}
       >
         {/* Logo */}
-        <div className="flex items-center gap-3">
-          <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-base"
-            style={{ background: '#F4C400', color: '#041B4D' }}
-          >
-            SC
-          </div>
-          <div>
-            <p className="font-bold text-white text-lg leading-tight">SkillCircle</p>
-            <p className="text-[11px] uppercase tracking-widest" style={{ color: '#F4C400' }}>
-              Partner CRM
-            </p>
-          </div>
-        </div>
+        <Image
+          src="/logo-white.png"
+          alt="SkillCircle"
+          width={180}
+          height={52}
+          className="object-contain"
+          priority
+        />
 
         {/* Hero text */}
         <div className="space-y-8">
@@ -119,14 +114,15 @@ export default function LoginPage() {
       <div className="flex-1 flex items-center justify-center p-8 bg-white">
         <div className="w-full max-w-md space-y-8">
           {/* Mobile logo */}
-          <div className="flex items-center gap-2.5 lg:hidden">
-            <div
-              className="w-9 h-9 rounded-xl flex items-center justify-center font-black text-sm"
-              style={{ background: '#041B4D', color: '#F4C400' }}
-            >
-              SC
-            </div>
-            <span className="font-bold text-xl" style={{ color: '#041B4D' }}>SkillCircle CRM</span>
+          <div className="lg:hidden">
+            <Image
+              src="/logo-dark.png"
+              alt="SkillCircle"
+              width={160}
+              height={46}
+              className="object-contain"
+              priority
+            />
           </div>
 
           <div>
